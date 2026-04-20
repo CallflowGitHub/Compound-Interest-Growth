@@ -16,7 +16,7 @@ A browser-based dashboard for visualising how an investment grows over time thro
 
 ## File Structure
 
-```
+```text
 Compound-Interest-Growth/
 ├── index.html          # Main HTML — dashboard layout and Chart.js CDN import
 ├── script/
@@ -42,10 +42,9 @@ No build step or server required. Just open `index.html` in any modern browser.
 
 Each month the balance is compounded and the monthly contribution is added:
 
-```
+```text
 monthlyRate = (1 + annualRate) ^ (1/12) - 1
 balance = balance × (1 + monthlyRate) + monthlyContribution
 ```
 
 This correctly reflects an annually-stated interest rate applied on a monthly basis, matching standard financial calculators.
-
