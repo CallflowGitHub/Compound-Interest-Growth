@@ -31,7 +31,7 @@ h1 {
 .dashboard {
   display: flex;
   gap: 32px;
-  align-items: flex-start;
+  align-items: stretch;
   flex-wrap: wrap;
 }
 
@@ -47,6 +47,32 @@ h1 {
   min-width: 240px;
   box-shadow: 0 0 30px rgba(124, 111, 247, 0.08);
   backdrop-filter: blur(6px);
+}
+
+.currency-toggle {
+  display: flex;
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.currency-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #a09bc8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.currency-btn.active {
+  background: linear-gradient(90deg, #7c6ff7, #00c9a7);
+  color: #fff;
 }
 
 .input-group {
@@ -118,10 +144,16 @@ button#calculateBtn:active {
   display: none;
   box-shadow: 0 0 30px rgba(0, 229, 176, 0.06);
   backdrop-filter: blur(6px);
+  flex-direction: column;
 }
 
 .chart-area.visible {
-  display: block;
+  display: flex;
+}
+
+.chart-area canvas {
+  flex: 1;
+  min-height: 0;
 }
 
 .summary {
@@ -161,4 +193,18 @@ button#calculateBtn:active {
   font-size: 1.5rem;
   font-weight: 700;
   color: #7c6ff7;
+}
+
+.convert-error {
+  font-size: 0.75rem;
+  color: #e05a5a;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.exchange-rate {
+  font-size: 0.75rem;
+  color: #a09bc8;
+  margin-top: 5px;
+  letter-spacing: 0.4px;
 }

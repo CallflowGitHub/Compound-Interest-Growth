@@ -1,4 +1,21 @@
 let chartInstance = null;
+let activeCurrency = 'USD'; // 'USD' or 'ILS'
+
+// Currency toggle
+document.querySelectorAll('.currency-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCurrency = btn.dataset.currency;
+    const sym = activeCurrency === 'ILS' ? '₪' : '$';
+    document.getElementById('labelInitial').textContent = `Initial Amount (${sym})`;
+    document.getElementById('labelMonthly').textContent = `Monthly Addition (${sym})`;
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('calculateBtn').click();
+});
 
 document.getElementById('calculateBtn').addEventListener('click', () => {
   const initialAmount = parseFloat(document.getElementById('initialAmount').value);
@@ -9,43 +26,48 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
   if (
     isNaN(initialAmount) || isNaN(monthlyAddition) ||
     isNaN(annualRate) || isNaN(years) ||
-    years < 1
+    years < 0.1
   ) {
     alert('Please fill in all fields with valid values.');
     return;
   }
 
   const rate = annualRate / 100;
-  const labels = [];
-  const data = [];
+  const chartData = [];
 
-  // Annual compounding with support for fractional years
-  // Use monthly steps internally for accuracy, sample at each whole/fractional year mark
-  const monthlyRate = Math.pow(1 + rate, 1 / 12) - 1;
-  const totalMonths = Math.round(years * 12);
+  const totalYears = Math.floor(years);
+  const remainingMonths = Math.round((years - totalYears) * 12);
+  const totalMonths = totalYears * 12 + remainingMonths;
+  const step = years <= 20 ? 1 : years <= 50 ? 2 : 5;
+
+  // Pre-build set of year marks to plot
+  const yearMarksToPlot = new Set();
+  for (let y = step; y < years; y += step) yearMarksToPlot.add(y);
+  yearMarksToPlot.add(totalYears);
+
   let balance = initialAmount;
-  labels.push('Year 0');
-  data.push(parseFloat(balance.toFixed(2)));
+  chartData.push({ x: 0, y: parseFloat(balance.toFixed(2)) });
 
-  for (let month = 1; month <= totalMonths; month++) {
-    balance = balance * (1 + monthlyRate) + monthlyAddition;
-    const yearMark = parseFloat((month / 12).toFixed(10));
-    const expectedMarks = [];
-    // collect year marks to plot
-    const step = years <= 20 ? 1 : years <= 50 ? 2 : 5;
-    for (let y = step; y <= years; y += step) expectedMarks.push(parseFloat(y.toFixed(10)));
-    if (!expectedMarks.includes(parseFloat(years.toFixed(10)))) expectedMarks.push(parseFloat(years.toFixed(10)));
-    if (expectedMarks.some(m => Math.abs(m - yearMark) < 0.001)) {
-      labels.push(`Year ${parseFloat(yearMark.toFixed(2))}`);
-      data.push(parseFloat(balance.toFixed(2)));
+  // Annual compounding: interest applied once per year, contributions added at end of year
+  for (let year = 1; year <= totalYears; year++) {
+    balance = balance * (1 + rate) + monthlyAddition * 12;
+    if (yearMarksToPlot.has(year)) {
+      chartData.push({ x: year, y: parseFloat(balance.toFixed(2)) });
     }
   }
 
-  renderChart(labels, data);
-  renderSummary(initialAmount, monthlyAddition, years, data);
+  // Handle remaining partial year (contributions added, interest prorated)
+  if (remainingMonths > 0) {
+    balance = balance * Math.pow(1 + rate, remainingMonths / 12) + monthlyAddition * remainingMonths;
+    chartData.push({ x: parseFloat(years.toFixed(4)), y: parseFloat(balance.toFixed(2)) });
+  }
+
+  renderChart(chartData, years, activeCurrency);
+  renderSummary(initialAmount, monthlyAddition, annualRate, years, totalMonths, chartData, activeCurrency);
 });
 
-function renderChart(labels, data) {
+function renderChart(chartData, years, currency) {
+  const sym = currency === 'ILS' ? '₪' : '$';
   const chartArea = document.getElementById('chartArea');
   chartArea.classList.add('visible');
 
@@ -58,11 +80,10 @@ function renderChart(labels, data) {
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels,
       datasets: [
         {
-          label: 'Portfolio Value ($)',
-          data,
+          label: 'Portfolio Value',
+          data: chartData,
           borderColor: '#7c6ff7',
           backgroundColor: (ctx) => {
             const canvas = ctx.chart.ctx;
@@ -72,7 +93,7 @@ function renderChart(labels, data) {
             return gradient;
           },
           borderWidth: 3,
-          pointRadius: data.length <= 21 ? 4 : 0,
+          pointRadius: chartData.length <= 21 ? 5 : 0,
           pointHoverRadius: 7,
           pointBackgroundColor: '#00e5b0',
           pointBorderColor: '#7c6ff7',
@@ -83,19 +104,28 @@ function renderChart(labels, data) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           labels: { color: '#e0e0e0' },
         },
         tooltip: {
           callbacks: {
-            label: (ctx) => ` $${ctx.parsed.y.toLocaleString()}`,
+            title: (items) => `Year ${items[0].parsed.x}`,
+            label: (ctx) => ` ${sym}${ctx.parsed.y.toLocaleString()}`,
           },
         },
       },
       scales: {
         x: {
-          ticks: { color: '#a09bc8' },
+          type: 'linear',
+          min: 0,
+          max: years,
+          ticks: {
+            color: '#a09bc8',
+            stepSize: years <= 20 ? 1 : years <= 50 ? 2 : 5,
+            callback: (value) => `Year ${value}`,
+          },
           grid: { color: 'rgba(124,111,247,0.1)' },
           title: {
             display: true,
@@ -106,12 +136,12 @@ function renderChart(labels, data) {
         y: {
           ticks: {
             color: '#a09bc8',
-            callback: (value) => '$' + value.toLocaleString(),
+            callback: (value) => sym + value.toLocaleString(),
           },
           grid: { color: 'rgba(124,111,247,0.1)' },
           title: {
             display: true,
-            text: 'Amount ($)',
+            text: `Amount (${sym})`,
             color: '#a09bc8',
           },
         },
@@ -120,23 +150,53 @@ function renderChart(labels, data) {
   });
 }
 
-function renderSummary(initialAmount, monthlyAddition, years, data) {
-  const finalValue = data[data.length - 1];
-  const totalContributions = initialAmount + monthlyAddition * years * 12;
+async function renderSummary(initialAmount, monthlyAddition, annualRate, years, totalMonths, chartData, currency) {
+  const sym = currency === 'ILS' ? '₪' : '$';
+  const finalValue = chartData[chartData.length - 1].y;
+  const totalContributions = initialAmount + monthlyAddition * totalMonths;
   const totalInterest = finalValue - totalContributions;
+  const monthlyPassive = parseFloat((finalValue * (annualRate / 100) / 12 * 0.75).toFixed(2));
+
+  // Monthly income card: if ILS mode, show directly; if USD, convert to ILS
+  let monthlyIncomeHTML;
+  if (currency === 'ILS') {
+    monthlyIncomeHTML = `<div class="value" style="color:#f9c846">${sym}${monthlyPassive.toLocaleString()}</div>`;
+  } else {
+    try {
+      const response = await fetch('https://open.er-api.com/v6/latest/USD');
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const rateData = await response.json();
+      if (!rateData.rates || !rateData.rates.ILS) throw new Error('ILS rate not found in response');
+      const ilsRate = rateData.rates.ILS;
+      const monthlyPassiveILS = parseFloat((monthlyPassive * ilsRate).toFixed(2));
+      monthlyIncomeHTML = `
+        <div class="value" style="color:#f9c846">₪${monthlyPassiveILS.toLocaleString()}</div>
+        <div class="exchange-rate">1 USD = ₪${ilsRate.toFixed(2)}</div>
+      `;
+    } catch (err) {
+      monthlyIncomeHTML = `
+        <div class="value" style="color:#f9c846">$${monthlyPassive.toLocaleString()}</div>
+        <div class="convert-error">Couldn't convert to New Israeli Shekels: ${err.message}</div>
+      `;
+    }
+  }
 
   document.getElementById('summary').innerHTML = `
     <div class="summary-card">
       <div class="label">Total Contributed</div>
-      <div class="value">$${totalContributions.toLocaleString()}</div>
+      <div class="value">${sym}${totalContributions.toLocaleString()}</div>
     </div>
     <div class="summary-card">
       <div class="label">Interest Earned</div>
-      <div class="value">$${Math.max(0, totalInterest).toLocaleString()}</div>
+      <div class="value">${sym}${Math.max(0, totalInterest).toLocaleString()}</div>
     </div>
     <div class="summary-card">
       <div class="label">Final Value</div>
-      <div class="value" style="color:#00e5b0">$${finalValue.toLocaleString()}</div>
+      <div class="value" style="color:#00e5b0">${sym}${finalValue.toLocaleString()}</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Net Monthly Income</div>
+      ${monthlyIncomeHTML}
     </div>
   `;
 }
