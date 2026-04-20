@@ -4,12 +4,270 @@
   padding: 0;
 }
 
+/* ── CSS Custom Properties (Default Theme) ── */
 body {
+  --bg: linear-gradient(135deg, #0a0e1a 0%, #0f1525 60%, #10091f 100%);
+  --text: #e0e0e0;
+  --accent1: #7c6ff7;
+  --accent2: #00e5b0;
+  --accent-gradient: linear-gradient(90deg, #7c6ff7, #00e5b0);
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(124, 111, 247, 0.3);
+  --card-shadow: rgba(124, 111, 247, 0.08);
+  --card-shadow-hover: rgba(124, 111, 247, 0.15);
+  --chart-border: rgba(0, 229, 176, 0.2);
+  --chart-shadow: rgba(0, 229, 176, 0.06);
+  --input-bg: rgba(0,0,0,0.3);
+  --input-border: rgba(124, 111, 247, 0.25);
+  --label-color: #a09bc8;
+  --grid-color: rgba(124,111,247,0.1);
+  --toggle-bg: rgba(0,0,0,0.25);
+  --value-color: #7c6ff7;
+  --final-color: #00e5b0;
+  --income-color: #f9c846;
+
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0a0e1a 0%, #0f1525 60%, #10091f 100%);
-  color: #e0e0e0;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   padding: 40px 20px;
+  transition: background 0.5s, color 0.4s;
+}
+
+/* ── Finance Theme ── */
+body.theme-finance {
+  --bg: linear-gradient(160deg, #0d1117 0%, #161b22 40%, #0d1117 100%);
+  --text: #c9d1d9;
+  --accent1: #3fb950;
+  --accent2: #f0883e;
+  --accent-gradient: linear-gradient(90deg, #3fb950, #f0883e);
+  --card-bg: rgba(22, 27, 34, 0.8);
+  --card-border: rgba(63, 185, 80, 0.3);
+  --card-shadow: rgba(63, 185, 80, 0.08);
+  --card-shadow-hover: rgba(63, 185, 80, 0.18);
+  --chart-border: rgba(63, 185, 80, 0.25);
+  --chart-shadow: rgba(63, 185, 80, 0.06);
+  --input-bg: rgba(0,0,0,0.4);
+  --input-border: rgba(63, 185, 80, 0.25);
+  --label-color: #8b949e;
+  --grid-color: rgba(63, 185, 80, 0.08);
+  --toggle-bg: rgba(0,0,0,0.4);
+  --value-color: #3fb950;
+  --final-color: #f0883e;
+  --income-color: #f9c846;
+}
+
+/* ── Beach Theme ── */
+body.theme-beach {
+  --bg: linear-gradient(180deg, #87CEEB 0%, #4db8d8 30%, #e8d5a3 65%, #f5e6c8 100%);
+  --text: #2c3e50;
+  --accent1: #e67e22;
+  --accent2: #16a085;
+  --accent-gradient: linear-gradient(90deg, #e67e22, #16a085);
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --card-border: rgba(230, 126, 34, 0.35);
+  --card-shadow: rgba(230, 126, 34, 0.12);
+  --card-shadow-hover: rgba(230, 126, 34, 0.25);
+  --chart-border: rgba(22, 160, 133, 0.3);
+  --chart-shadow: rgba(22, 160, 133, 0.1);
+  --input-bg: rgba(255,255,255,0.6);
+  --input-border: rgba(230, 126, 34, 0.3);
+  --label-color: #5d6d7e;
+  --grid-color: rgba(44, 62, 80, 0.1);
+  --toggle-bg: rgba(255,255,255,0.35);
+  --value-color: #e67e22;
+  --final-color: #16a085;
+  --income-color: #d4a017;
+}
+
+body.theme-beach input[type="number"] {
+  color: #2c3e50;
+}
+
+/* ── Theme Background Layer ── */
+#themeBg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Finance Background Decorations (legacy – replaced by canvas) ── */
+body.theme-finance::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.07;
+  background:
+    /* Candlestick chart - left side */
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 8% 85%/3px 80px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 8% 78%/1px 120px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 11% 80%/3px 60px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 11% 76%/1px 100px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 14% 75%/3px 50px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 14% 72%/1px 90px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 17% 70%/3px 70px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 17% 64%/1px 110px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 20% 65%/3px 55px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 20% 60%/1px 100px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 23% 68%/3px 45px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 23% 65%/1px 80px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 26% 60%/3px 65px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 26% 54%/1px 105px no-repeat,
+
+    /* Candlestick chart - right side */
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 78% 55%/3px 70px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 78% 48%/1px 110px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 81% 60%/3px 50px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 81% 57%/1px 85px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 84% 50%/3px 75px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 84% 43%/1px 115px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 87% 45%/3px 60px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 87% 40%/1px 95px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 90% 50%/3px 55px no-repeat,
+    linear-gradient(0deg, #f85149 0%, #f85149 100%) 90% 46%/1px 90px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 93% 42%/3px 65px no-repeat,
+    linear-gradient(0deg, #3fb950 0%, #3fb950 100%) 93% 36%/1px 105px no-repeat,
+
+    /* Horizontal grid lines */
+    linear-gradient(0deg, rgba(63,185,80,0.3) 0%, rgba(63,185,80,0.3) 100%) 0% 30%/100% 1px no-repeat,
+    linear-gradient(0deg, rgba(63,185,80,0.3) 0%, rgba(63,185,80,0.3) 100%) 0% 50%/100% 1px no-repeat,
+    linear-gradient(0deg, rgba(63,185,80,0.3) 0%, rgba(63,185,80,0.3) 100%) 0% 70%/100% 1px no-repeat,
+    linear-gradient(0deg, rgba(63,185,80,0.3) 0%, rgba(63,185,80,0.3) 100%) 0% 90%/100% 1px no-repeat;
+}
+
+body.theme-finance::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background:
+    /* Moving average curve (simulated with dots) */
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 6% 88%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 9% 83%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 12% 79%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 15% 74%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 18% 69%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 21% 66%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 24% 62%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 76% 58%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 79% 55%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 82% 52%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 85% 48%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 88% 46%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 91% 43%/4px 4px no-repeat,
+    radial-gradient(circle 2px, #f0883e 100%, transparent 100%) 94% 40%/4px 4px no-repeat,
+
+    /* Ticker tape top */
+    linear-gradient(90deg, transparent 0%, rgba(63,185,80,0.4) 10%, transparent 20%,
+      transparent 25%, rgba(248,81,73,0.4) 35%, transparent 45%,
+      transparent 50%, rgba(63,185,80,0.4) 60%, transparent 70%,
+      transparent 75%, rgba(63,185,80,0.4) 85%, transparent 95%) 0% 3%/100% 2px no-repeat,
+    linear-gradient(90deg, transparent 5%, rgba(248,81,73,0.4) 15%, transparent 25%,
+      transparent 30%, rgba(63,185,80,0.4) 40%, transparent 50%,
+      transparent 55%, rgba(248,81,73,0.4) 65%, transparent 75%,
+      transparent 80%, rgba(63,185,80,0.4) 90%, transparent 100%) 0% 5%/100% 2px no-repeat;
+}
+
+/* ── Beach Background Decorations ── */
+body.theme-beach::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    /* Sun */
+    radial-gradient(circle 45px, rgba(255,200,50,0.35) 0%, rgba(255,200,50,0.15) 50%, transparent 100%) 88% 8%/120px 120px no-repeat,
+    /* Sun rays */
+    radial-gradient(circle 70px, rgba(255,200,50,0.08) 0%, transparent 100%) 88% 8%/180px 180px no-repeat,
+
+    /* Clouds */
+    radial-gradient(ellipse 60px 25px, rgba(255,255,255,0.4) 0%, transparent 100%) 15% 10%/120px 50px no-repeat,
+    radial-gradient(ellipse 45px 20px, rgba(255,255,255,0.35) 0%, transparent 100%) 18% 9%/90px 40px no-repeat,
+    radial-gradient(ellipse 55px 22px, rgba(255,255,255,0.3) 0%, transparent 100%) 55% 6%/110px 44px no-repeat,
+    radial-gradient(ellipse 40px 18px, rgba(255,255,255,0.25) 0%, transparent 100%) 58% 5%/80px 36px no-repeat,
+
+    /* Ocean waves */
+    radial-gradient(ellipse 200% 8px, rgba(255,255,255,0.2) 0%, transparent 100%) 0% 52%/100% 8px no-repeat,
+    radial-gradient(ellipse 200% 6px, rgba(255,255,255,0.15) 0%, transparent 100%) 0% 55%/100% 6px no-repeat,
+    radial-gradient(ellipse 200% 5px, rgba(255,255,255,0.12) 0%, transparent 100%) 0% 58%/100% 5px no-repeat;
+}
+
+body.theme-beach::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    /* Palm tree 1 - left trunk */
+    linear-gradient(2deg, #5d4037 0%, #6d4c41 100%) 5% 95%/6px 180px no-repeat,
+    linear-gradient(5deg, #5d4037 0%, #6d4c41 100%) 5.1% 72%/5px 60px no-repeat,
+    /* Palm leaves - left */
+    radial-gradient(ellipse 70px 15px, rgba(34,139,34,0.5) 0%, transparent 100%) 1% 58%/140px 30px no-repeat,
+    radial-gradient(ellipse 60px 12px, rgba(34,139,34,0.45) 0%, transparent 100%) 7% 56%/120px 24px no-repeat,
+    radial-gradient(ellipse 55px 14px, rgba(46,139,87,0.4) 0%, transparent 100%) 2% 61%/110px 28px no-repeat,
+    radial-gradient(ellipse 65px 11px, rgba(34,139,34,0.35) 0%, transparent 100%) 6% 63%/130px 22px no-repeat,
+    radial-gradient(ellipse 50px 13px, rgba(46,139,87,0.45) 0%, transparent 100%) 3% 55%/100px 26px no-repeat,
+
+    /* Palm tree 2 - right trunk */
+    linear-gradient(-3deg, #5d4037 0%, #795548 100%) 92% 95%/7px 200px no-repeat,
+    linear-gradient(-5deg, #5d4037 0%, #795548 100%) 91.8% 68%/5px 50px no-repeat,
+    /* Palm leaves - right */
+    radial-gradient(ellipse 75px 16px, rgba(34,139,34,0.45) 0%, transparent 100%) 88% 54%/150px 32px no-repeat,
+    radial-gradient(ellipse 60px 13px, rgba(46,139,87,0.4) 0%, transparent 100%) 94% 52%/120px 26px no-repeat,
+    radial-gradient(ellipse 65px 14px, rgba(34,139,34,0.35) 0%, transparent 100%) 89% 57%/130px 28px no-repeat,
+    radial-gradient(ellipse 55px 12px, rgba(46,139,87,0.4) 0%, transparent 100%) 95% 55%/110px 24px no-repeat,
+    radial-gradient(ellipse 50px 15px, rgba(34,139,34,0.45) 0%, transparent 100%) 90% 50%/100px 30px no-repeat,
+
+    /* Seagulls */
+    radial-gradient(ellipse 12px 3px, rgba(44,62,80,0.2) 0%, transparent 100%) 30% 15%/24px 6px no-repeat,
+    radial-gradient(ellipse 10px 3px, rgba(44,62,80,0.15) 0%, transparent 100%) 35% 12%/20px 6px no-repeat,
+    radial-gradient(ellipse 8px 2px, rgba(44,62,80,0.12) 0%, transparent 100%) 70% 18%/16px 4px no-repeat;
+}
+
+/* ── Theme Switcher ── */
+.theme-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.theme-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--label-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(6px);
+}
+
+.theme-btn:hover {
+  border-color: var(--accent1);
+  color: var(--text);
+}
+
+.theme-btn.active {
+  background: var(--accent-gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 12px var(--card-shadow);
 }
 
 .container {
@@ -21,7 +279,7 @@ h1 {
   text-align: center;
   font-size: 2.2rem;
   margin-bottom: 36px;
-  background: linear-gradient(90deg, #7c6ff7, #00e5b0);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -36,8 +294,8 @@ h1 {
 }
 
 .inputs {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(124, 111, 247, 0.3);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 16px;
   padding: 28px 24px;
   display: flex;
@@ -45,13 +303,14 @@ h1 {
   gap: 18px;
   flex: 0 0 280px;
   min-width: 240px;
-  box-shadow: 0 0 30px rgba(124, 111, 247, 0.08);
+  box-shadow: 0 0 30px var(--card-shadow);
   backdrop-filter: blur(6px);
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
 }
 
 .currency-toggle {
   display: flex;
-  background: rgba(0,0,0,0.25);
+  background: var(--toggle-bg);
   border-radius: 10px;
   padding: 4px;
   gap: 4px;
@@ -63,7 +322,7 @@ h1 {
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: #a09bc8;
+  color: var(--label-color);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -71,7 +330,7 @@ h1 {
 }
 
 .currency-btn.active {
-  background: linear-gradient(90deg, #7c6ff7, #00c9a7);
+  background: var(--accent-gradient);
   color: #fff;
 }
 
@@ -85,18 +344,18 @@ label {
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #a09bc8;
+  color: var(--label-color);
 }
 
 input[type="number"] {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(124, 111, 247, 0.25);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
-  color: #ffffff;
+  color: inherit;
   font-size: 1rem;
   padding: 10px 14px;
   outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.4s;
   -moz-appearance: textfield;
 }
 
@@ -106,14 +365,14 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 input[type="number"]:focus {
-  border-color: #7c6ff7;
-  box-shadow: 0 0 0 3px rgba(124, 111, 247, 0.2);
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 3px var(--card-shadow);
 }
 
 button#calculateBtn {
   margin-top: 6px;
   padding: 13px;
-  background: linear-gradient(90deg, #7c6ff7, #00c9a7);
+  background: var(--accent-gradient);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -122,12 +381,12 @@ button#calculateBtn {
   cursor: pointer;
   letter-spacing: 0.5px;
   transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(124, 111, 247, 0.4);
+  box-shadow: 0 4px 20px var(--card-shadow);
 }
 
 button#calculateBtn:hover {
   opacity: 0.88;
-  box-shadow: 0 6px 28px rgba(124, 111, 247, 0.6);
+  box-shadow: 0 6px 28px var(--card-shadow-hover);
 }
 
 button#calculateBtn:active {
@@ -137,12 +396,12 @@ button#calculateBtn:active {
 .chart-area {
   flex: 1;
   min-width: 0;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(0, 229, 176, 0.2);
+  background: var(--card-bg);
+  border: 1px solid var(--chart-border);
   border-radius: 16px;
   padding: 24px;
   display: none;
-  box-shadow: 0 0 30px rgba(0, 229, 176, 0.06);
+  box-shadow: 0 0 30px var(--chart-shadow);
   backdrop-filter: blur(6px);
   flex-direction: column;
 }
@@ -164,35 +423,35 @@ button#calculateBtn:active {
 }
 
 .summary-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(124, 111, 247, 0.25);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 14px;
   padding: 20px 24px;
   flex: 1;
   min-width: 180px;
   text-align: center;
-  box-shadow: 0 0 20px rgba(124, 111, 247, 0.06);
+  box-shadow: 0 0 20px var(--card-shadow);
   backdrop-filter: blur(6px);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.4s, border-color 0.4s;
 }
 
 .summary-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(124, 111, 247, 0.15);
+  box-shadow: 0 6px 28px var(--card-shadow-hover);
 }
 
 .summary-card .label {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #a09bc8;
+  color: var(--label-color);
   margin-bottom: 8px;
 }
 
 .summary-card .value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #7c6ff7;
+  color: var(--value-color);
 }
 
 .convert-error {
@@ -204,7 +463,7 @@ button#calculateBtn:active {
 
 .exchange-rate {
   font-size: 0.75rem;
-  color: #a09bc8;
+  color: var(--label-color);
   margin-top: 5px;
   letter-spacing: 0.4px;
 }
