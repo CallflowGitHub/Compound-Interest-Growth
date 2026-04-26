@@ -80,6 +80,18 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('calculateBtn').click();
 });
 
+// Rate slider: update display and auto-recalculate
+const annualRateSlider = document.getElementById('annualRate');
+const annualRateDisplay = document.getElementById('annualRateDisplay');
+let _sliderTriggered = false;
+
+annualRateSlider.addEventListener('input', () => {
+  annualRateDisplay.textContent = annualRateSlider.value;
+  _sliderTriggered = true;
+  document.getElementById('calculateBtn').click();
+  _sliderTriggered = false;
+});
+
 document.getElementById('calculateBtn').addEventListener('click', () => {
   const initialAmount = parseFloat(document.getElementById('initialAmount').value);
   const monthlyAddition = parseFloat(document.getElementById('monthlyAddition').value);
@@ -91,7 +103,7 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
     isNaN(annualRate) || isNaN(years) ||
     years < 0.1
   ) {
-    alert('Please fill in all fields with valid values.');
+    if (!_sliderTriggered) alert('Please fill in all fields with valid values.');
     return;
   }
 
