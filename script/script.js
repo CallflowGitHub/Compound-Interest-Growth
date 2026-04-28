@@ -73,6 +73,13 @@ document.querySelectorAll('.currency-btn').forEach(btn => {
     const sym = activeCurrency === 'ILS' ? '₪' : '$';
     document.getElementById('labelInitial').textContent = `Initial Amount (${sym})`;
     document.getElementById('labelMonthly').textContent = `Monthly Addition (${sym})`;
+
+    // Auto-recalculate if all fields have values
+    const initialVal = document.getElementById('initialAmount').value;
+    const monthlyVal = document.getElementById('monthlyAddition').value;
+    if (initialVal !== '' && monthlyVal !== '') {
+      document.getElementById('calculateBtn').click();
+    }
   });
 });
 
@@ -92,6 +99,17 @@ annualRateSlider.addEventListener('input', () => {
   _sliderTriggered = false;
 });
 
+// Years slider: update display and auto-recalculate
+const yearsSlider = document.getElementById('years');
+const yearsDisplay = document.getElementById('yearsDisplay');
+
+yearsSlider.addEventListener('input', () => {
+  yearsDisplay.textContent = yearsSlider.value;
+  _sliderTriggered = true;
+  document.getElementById('calculateBtn').click();
+  _sliderTriggered = false;
+});
+
 document.getElementById('calculateBtn').addEventListener('click', () => {
   const initialAmount = parseFloat(document.getElementById('initialAmount').value);
   const monthlyAddition = parseFloat(document.getElementById('monthlyAddition').value);
@@ -101,7 +119,7 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
   if (
     isNaN(initialAmount) || isNaN(monthlyAddition) ||
     isNaN(annualRate) || isNaN(years) ||
-    years < 0.1
+    years < 1
   ) {
     if (!_sliderTriggered) alert('Please fill in all fields with valid values.');
     return;

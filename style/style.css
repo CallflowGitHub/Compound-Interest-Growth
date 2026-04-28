@@ -468,7 +468,17 @@ button#calculateBtn:active {
   letter-spacing: 0.4px;
 }
 
-/* ── Rate Slider ── */
+/* ── Range Slider ── */
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.4s;
+}
+
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -511,7 +521,8 @@ input[type="range"]::-moz-range-thumb {
   transition: background 0.3s, transform 0.15s;
 }
 
-#annualRateDisplay {
+#annualRateDisplay,
+#yearsDisplay {
   color: var(--accent1);
   font-weight: 700;
 }
