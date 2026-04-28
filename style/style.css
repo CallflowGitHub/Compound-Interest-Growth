@@ -84,6 +84,33 @@ body.theme-beach input[type="number"] {
   color: #2c3e50;
 }
 
+/* ── Hospital Theme ── */
+body.theme-hospital {
+  --bg: linear-gradient(180deg, #e8f4fd 0%, #f0f8ff 50%, #e4f1fa 100%);
+  --text: #1a2a3a;
+  --accent1: #0066cc;
+  --accent2: #00a878;
+  --accent-gradient: linear-gradient(90deg, #0066cc, #00a878);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(0, 102, 204, 0.22);
+  --card-shadow: rgba(0, 102, 204, 0.08);
+  --card-shadow-hover: rgba(0, 102, 204, 0.18);
+  --chart-border: rgba(0, 168, 120, 0.28);
+  --chart-shadow: rgba(0, 168, 120, 0.07);
+  --input-bg: rgba(255, 255, 255, 0.92);
+  --input-border: rgba(0, 102, 204, 0.25);
+  --label-color: #4a6a8a;
+  --grid-color: rgba(0, 102, 204, 0.07);
+  --toggle-bg: rgba(0, 102, 204, 0.07);
+  --value-color: #0066cc;
+  --final-color: #00a878;
+  --income-color: #e67e22;
+}
+
+body.theme-hospital input[type="number"] {
+  color: #1a2a3a;
+}
+
 /* ── Theme Background Layer ── */
 #themeBg {
   position: fixed;

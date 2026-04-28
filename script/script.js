@@ -40,6 +40,18 @@ const themeColors = {
     final: '#16a085',
     income: '#d4a017',
   },
+  hospital: {
+    line: '#0066cc',
+    gradientTop: 'rgba(0, 102, 204, 0.28)',
+    gradientBottom: 'rgba(0, 168, 120, 0.04)',
+    point: '#00a878',
+    pointBorder: '#0066cc',
+    text: '#1a2a3a',
+    label: '#4a6a8a',
+    grid: 'rgba(0, 102, 204, 0.08)',
+    final: '#00a878',
+    income: '#e67e22',
+  },
 };
 
 // Theme toggle
@@ -50,7 +62,7 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
     activeTheme = btn.dataset.theme;
 
     // Remove all theme classes, add new one
-    document.body.classList.remove('theme-finance', 'theme-beach');
+    document.body.classList.remove('theme-finance', 'theme-beach', 'theme-hospital');
     if (activeTheme !== 'default') {
       document.body.classList.add('theme-' + activeTheme);
     }
@@ -70,7 +82,7 @@ document.querySelectorAll('.currency-btn').forEach(btn => {
     document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeCurrency = btn.dataset.currency;
-    const sym = activeCurrency === 'ILS' ? '₪' : '$';
+    const sym = activeCurrency === 'ILS' ? '₪' : activeCurrency === 'EUR' ? '€' : '$';
     document.getElementById('labelInitial').textContent = `Initial Amount (${sym})`;
     document.getElementById('labelMonthly').textContent = `Monthly Addition (${sym})`;
 
@@ -160,7 +172,7 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
 });
 
 function renderChart(chartData, years, currency) {
-  const sym = currency === 'ILS' ? '₪' : '$';
+  const sym = currency === 'ILS' ? '₪' : currency === 'EUR' ? '€' : '$';
   const tc = themeColors[activeTheme];
   const chartArea = document.getElementById('chartArea');
   chartArea.classList.add('visible');
@@ -245,20 +257,21 @@ function renderChart(chartData, years, currency) {
 }
 
 async function renderSummary(initialAmount, monthlyAddition, annualRate, years, totalMonths, chartData, currency) {
-  const sym = currency === 'ILS' ? '₪' : '$';
+  const sym = currency === 'ILS' ? '₪' : currency === 'EUR' ? '€' : '$';
   const tc = themeColors[activeTheme];
   const finalValue = chartData[chartData.length - 1].y;
   const totalContributions = initialAmount + monthlyAddition * totalMonths;
   const totalInterest = finalValue - totalContributions;
   const monthlyPassive = parseFloat((finalValue * (annualRate / 100) / 12 * 0.75).toFixed(2));
 
-  // Monthly income card: if ILS mode, show directly; if USD, convert to ILS
+  // Monthly income card: if ILS mode, show directly; if USD/EUR, convert to ILS
   let monthlyIncomeHTML;
   if (currency === 'ILS') {
     monthlyIncomeHTML = `<div class="value" style="color:${tc.income}">${sym}${monthlyPassive.toLocaleString()}</div>`;
   } else {
+    const curLabel = currency === 'EUR' ? '1 EUR' : '1 USD';
     try {
-      const response = await fetch('https://open.er-api.com/v6/latest/USD');
+      const response = await fetch(`https://open.er-api.com/v6/latest/${currency}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       const rateData = await response.json();
       if (!rateData.rates || !rateData.rates.ILS) throw new Error('ILS rate not found in response');
@@ -266,11 +279,11 @@ async function renderSummary(initialAmount, monthlyAddition, annualRate, years, 
       const monthlyPassiveILS = parseFloat((monthlyPassive * ilsRate).toFixed(2));
       monthlyIncomeHTML = `
         <div class="value" style="color:${tc.income}">₪${monthlyPassiveILS.toLocaleString()}</div>
-        <div class="exchange-rate">1 USD = ₪${ilsRate.toFixed(2)}</div>
+        <div class="exchange-rate">${curLabel} = ₪${ilsRate.toFixed(2)}</div>
       `;
     } catch (err) {
       monthlyIncomeHTML = `
-        <div class="value" style="color:${tc.income}">$${monthlyPassive.toLocaleString()}</div>
+        <div class="value" style="color:${tc.income}">${sym}${monthlyPassive.toLocaleString()}</div>
         <div class="convert-error">Couldn't convert to New Israeli Shekels: ${err.message}</div>
       `;
     }
@@ -324,6 +337,8 @@ function applyThemeBackground(theme) {
 
   } else if (theme === 'beach') {
     bg.innerHTML = getBeachSVG();
+  } else if (theme === 'hospital') {
+    bg.innerHTML = getHospitalSVG();
   }
 }
 
@@ -797,5 +812,67 @@ function getBeachSVG() {
     <ellipse cx="762" cy="904" rx="5" ry="9" transform="rotate(12,762,904)"/>
     <ellipse cx="778" cy="895" rx="5" ry="9" transform="rotate(-6,778,895)"/>
   </g>
+</svg>`;
+}
+
+// ── Hospital SVG Background ─────────────────────────────────────────────────────
+
+function getHospitalSVG() {
+  function ecgPath(startX, baseY, scale, beatWidth) {
+    let d = `M${startX},${baseY}`;
+    let x = startX;
+    const count = Math.ceil((1960 - startX) / beatWidth) + 1;
+    for (let i = 0; i < count; i++) {
+      const bx = x;
+      const s = scale;
+      d += ` L${bx + 40 * s},${baseY}`;
+      d += ` Q${bx + 50 * s},${baseY - 12 * s} ${bx + 60 * s},${baseY}`;
+      d += ` L${bx + 80 * s},${baseY}`;
+      d += ` L${bx + 83 * s},${baseY + 8 * s} L${bx + 86 * s},${baseY - 55 * s} L${bx + 89 * s},${baseY + 10 * s} L${bx + 94 * s},${baseY}`;
+      d += ` L${bx + 120 * s},${baseY}`;
+      d += ` Q${bx + 135 * s},${baseY - 18 * s} ${bx + 150 * s},${baseY}`;
+      d += ` L${bx + beatWidth},${baseY}`;
+      x += beatWidth;
+    }
+    return d;
+  }
+
+  const ecg1 = ecgPath(0, 420, 1, 200);
+  const ecg2 = ecgPath(-60, 700, 1.3, 260);
+  const ecg3 = ecgPath(80, 240, 0.65, 130);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+  <defs>
+    <pattern id="hGridSmall" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,102,204,0.05)" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="hGridBig" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M 200 0 L 0 0 0 200" fill="none" stroke="rgba(0,102,204,0.09)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#hGridSmall)"/>
+  <rect width="1920" height="1080" fill="url(#hGridBig)"/>
+  <!-- ECG lines -->
+  <path d="${ecg1}" fill="none" stroke="rgba(0,102,204,0.14)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${ecg2}" fill="none" stroke="rgba(0,168,120,0.10)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${ecg3}" fill="none" stroke="rgba(0,102,204,0.07)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Medical cross top-left -->
+  <rect x="68" y="148" width="44" height="14" rx="3" fill="rgba(0,102,204,0.08)"/>
+  <rect x="82" y="134" width="14" height="44" rx="3" fill="rgba(0,102,204,0.08)"/>
+  <!-- Medical cross top-right -->
+  <rect x="1808" y="192" width="52" height="16" rx="3" fill="rgba(0,102,204,0.07)"/>
+  <rect x="1824" y="176" width="16" height="52" rx="3" fill="rgba(0,102,204,0.07)"/>
+  <!-- Medical cross bottom-left -->
+  <rect x="88" y="890" width="38" height="12" rx="2" fill="rgba(0,168,120,0.08)"/>
+  <rect x="101" y="877" width="12" height="38" rx="2" fill="rgba(0,168,120,0.08)"/>
+  <!-- Medical cross bottom-right -->
+  <rect x="1828" y="862" width="44" height="13" rx="3" fill="rgba(0,102,204,0.07)"/>
+  <rect x="1841" y="849" width="13" height="44" rx="3" fill="rgba(0,102,204,0.07)"/>
+  <!-- Monitor frame top-right corner -->
+  <rect x="1580" y="60" width="280" height="180" rx="10" fill="none" stroke="rgba(0,102,204,0.07)" stroke-width="2"/>
+  <path d="${ecgPath(1590, 150, 0.55, 112)}" fill="none" stroke="rgba(0,168,120,0.18)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Pulse dot -->
+  <circle cx="1840" cy="150" r="5" fill="rgba(0,168,120,0.22)"/>
+  <circle cx="1840" cy="150" r="9" fill="none" stroke="rgba(0,168,120,0.1)" stroke-width="2"/>
 </svg>`;
 }
